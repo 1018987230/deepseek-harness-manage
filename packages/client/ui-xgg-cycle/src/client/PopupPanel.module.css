@@ -1,0 +1,1066 @@
+/* xgg-cycle top-right popup: a fixed-position surface that opts back into
+   pointer events over the otherwise click-through overlay layer. The open panel
+   covers ~90% of the viewport (centered), with a left vertical phase menu and a
+   right body that swaps between the 需求 (requirement) list and the other
+   phases' placeholder panels. */
+
+.root {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  background: var(--dsw-alias-state-warn-primary);
+  color: var(--dsw-specific-input-major);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--dsw-shadow-lv2);
+}
+
+.toggle:hover {
+  filter: brightness(1.06);
+}
+
+/* The large centered surface: 90% width and height, anchored to the viewport
+   (not the flex column) so it reads as a full workflow panel. */
+.panel {
+  position: fixed;
+  top: 5vh;
+  left: 5vw;
+  width: 90vw;
+  height: 90vh;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 16px;
+  background: var(--dsw-specific-input-major);
+  color: var(--dsw-alias-label-primary);
+  box-shadow: var(--dsw-shadow-lv2);
+}
+
+/* Left phase menu: a fixed-width vertical rail with its own scroll. */
+.menu {
+  flex: 0 0 148px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 12px 10px;
+  gap: 4px;
+  border-right: 1px solid var(--dsw-alias-border-l2);
+}
+
+.menuTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dsw-alias-label-secondary);
+  margin-bottom: 4px;
+}
+
+.menuItem,
+.menuItemActive {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 10px;
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background: var(--dsw-alias-border-l1);
+}
+
+.menuItemActive {
+  background: var(--dsw-alias-state-warn-tertiary);
+  color: var(--dsw-alias-state-warn-primary);
+  font-weight: 600;
+}
+
+/* Right body: the active phase's content. */
+.body {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 16px 20px 20px;
+}
+
+.phaseTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--dsw-alias-label-primary);
+  margin-bottom: 4px;
+}
+
+.phaseDescription {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  border: 1px dashed var(--dsw-alias-border-l2);
+  border-radius: 12px;
+  padding: 16px;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* 需求 phase: add row + requirement list + per-item 扩展/删除 actions.
+   No width cap — the pane is the panel's whole body width; the lists below
+   reflow into as many columns as that width affords. */
+.requirementPane {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.addRow {
+  display: flex;
+  gap: 8px;
+}
+
+.input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  padding: 7px 10px;
+  background: var(--dsw-specific-input-major);
+  color: var(--dsw-alias-label-primary);
+  font-size: 14px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--dsw-alias-state-warn-primary);
+}
+
+.addButton {
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  background: var(--dsw-alias-state-warn-primary);
+  color: var(--dsw-specific-input-major);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.addButton:hover {
+  filter: brightness(1.06);
+}
+
+.empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--dsw-alias-label-secondary);
+  border: 1px dashed var(--dsw-alias-border-l2);
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /* Rows are short (a requirement line, a key/value pair), so they reflow into
+     as many ~420px columns as the panel is wide instead of one tall stack. */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 8px;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  padding: 8px 12px;
+  background: var(--dsw-specific-input-major);
+}
+
+.itemText {
+  flex: 1 1 auto;
+  min-width: 0;
+  word-break: break-word;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.itemActions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.expandButton {
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  background: var(--dsw-alias-state-warn-primary);
+  color: var(--dsw-specific-input-major);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.expandButton:hover {
+  filter: brightness(1.06);
+}
+
+.removeButton {
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  padding: 6px 10px;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.removeButton:hover {
+  color: var(--dsw-alias-state-error-primary);
+}
+
+/* 「打开」 button shown once a requirement is expanded. */
+.openButton {
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  background: var(--dsw-alias-state-warn-tertiary);
+  color: var(--dsw-alias-state-warn-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.openButton:hover {
+  filter: brightness(1.04);
+}
+
+/* 功能点 phase: read-only table backed by the confirmed feature points. */
+.featurePane {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Expansion result table modal, layered above the panel. */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dsw-alias-bg-mask-1);
+}
+
+.modal {
+  width: 88vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 16px;
+  background: var(--dsw-specific-input-major);
+  color: var(--dsw-alias-label-primary);
+  box-shadow: var(--dsw-shadow-lv2);
+}
+
+.modalHeader {
+  flex: 0 0 auto;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--dsw-alias-border-l2);
+}
+
+.modalTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.modalSubtitle {
+  font-size: 13px;
+  color: var(--dsw-alias-label-secondary);
+  word-break: break-word;
+}
+
+.table {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  overflow-y: auto;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--dsw-alias-border-l1);
+  vertical-align: top;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--dsw-specific-input-major);
+  font-size: 13px;
+  color: var(--dsw-alias-label-secondary);
+  border-bottom: 1px solid var(--dsw-alias-border-l2);
+}
+
+.tickCol {
+  width: 40px;
+}
+
+.nameCol {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.descCol {
+  color: var(--dsw-alias-label-secondary);
+  line-height: 1.5;
+}
+
+.priorityP0 {
+  display: inline-block;
+  border-radius: 8px;
+  padding: 2px 8px;
+  background: var(--dsw-alias-state-error-primary);
+  color: var(--dsw-specific-input-major);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.priorityP1 {
+  display: inline-block;
+  border-radius: 8px;
+  padding: 2px 8px;
+  background: var(--dsw-alias-state-warn-primary);
+  color: var(--dsw-specific-input-major);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.priorityP2 {
+  display: inline-block;
+  border-radius: 8px;
+  padding: 2px 8px;
+  background: var(--dsw-alias-border-l2);
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.modalFooter {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 10px 18px;
+  border-top: 1px solid var(--dsw-alias-border-l2);
+}
+
+.confirmButton {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  background: var(--dsw-alias-state-warn-primary);
+  color: var(--dsw-specific-input-major);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.confirmButton:hover {
+  filter: brightness(1.06);
+}
+
+.cancelButton {
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cancelButton:hover {
+  color: var(--dsw-alias-label-primary);
+}
+
+/* Modal scrollable body between the header and footer. */
+.modalBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 14px;
+}
+
+/* Grouped module/points editor. Modules are independent cards, so they tile
+   across the available width rather than stacking one per row. */
+.moduleList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  align-items: start;
+  gap: 10px;
+  padding: 8px;
+}
+
+.moduleCard {
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 12px;
+  background: var(--dsw-specific-input-major);
+  overflow: hidden;
+}
+
+.moduleHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--dsw-alias-border-l1);
+  border-bottom: 1px solid var(--dsw-alias-border-l2);
+}
+
+.moduleName {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dsw-alias-label-primary);
+}
+
+.pointList {
+  list-style: none;
+  margin: 0;
+  padding: 2px 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.pointRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--dsw-alias-border-l1);
+}
+
+/* The head line: tick, tier, title, completion, and the delete control pinned
+   right. Never wraps — that is what put the ✕ on a line of its own. */
+.pointHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pointRow:last-child {
+  border-bottom: none;
+}
+
+.pointCheck {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.pointName {
+  flex: 1 1 0;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pointDesc {
+  padding-left: 2px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--dsw-alias-label-secondary);
+  word-break: break-word;
+}
+
+.addPointLink,
+.addModuleLink {
+  display: inline-flex;
+  align-items: center;
+  border: 1px dashed var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  padding: 5px 10px;
+  background: transparent;
+  color: var(--dsw-alias-state-warn-primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 4px 12px 8px;
+}
+
+/* Sits in .moduleList's grid alongside the cards — claim the whole row so a
+   lone module does not leave it stranded in a half-width cell. */
+.addModuleLink,
+.addModuleForm {
+  grid-column: 1 / -1;
+  margin: 0;
+  justify-self: start;
+  align-self: start;
+}
+
+.addPointLink:hover,
+.addModuleLink:hover {
+  background: var(--dsw-alias-border-l1);
+}
+
+.addPointForm,
+.addModuleForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 12px 10px;
+  align-items: center;
+}
+
+.prioritySelect {
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  padding: 9px 10px;
+  background: var(--dsw-specific-input-major);
+  color: var(--dsw-alias-label-primary);
+  font-size: 14px;
+}
+
+/* 基础信息 key/value display. */
+.infoKey {
+  flex: 0 0 auto;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dsw-alias-label-primary);
+}
+
+.infoColon {
+  flex: 0 0 auto;
+  color: var(--dsw-alias-label-secondary);
+}
+
+/* 功能点 phase: requirement groups, each with its own module stack. */
+.groupList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reqGroup {
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 14px;
+  background: var(--dsw-specific-input-major);
+  overflow: hidden;
+}
+
+.reqGroupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--dsw-alias-border-l1);
+  border-bottom: 1px solid var(--dsw-alias-border-l2);
+}
+
+.reqGroupTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dsw-alias-label-primary);
+}
+
+/* 原型 phase preview. */
+.preview {
+  margin-top: 10px;
+}
+
+.previewTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dsw-alias-label-secondary);
+  margin-bottom: 6px;
+}
+
+.previewBody {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 12px;
+  background: var(--dsw-alias-bg-mask-1);
+  color: var(--dsw-alias-label-primary);
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  /* The panel body already scrolls; a second nested scroller here just shrank
+     the readable window to half of it. */
+  overflow: visible;
+}
+
+/* 原型 hand-off failure notice (session create / submit round trip). */
+.startError {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-mask-1);
+  color: var(--dsw-alias-state-error-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* 原型 delivery-shape picker: the two exclusive cards and the hand-off button
+   share one band, so the preview below starts near the top of the pane. */
+.modeBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.modeRow {
+  flex: 1 1 auto;
+  display: flex;
+  gap: 10px;
+  max-width: 760px;
+}
+
+.modeCard,
+.modeCardActive {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.modeCard:hover {
+  background: var(--dsw-alias-bg-mask-1);
+}
+
+.modeCardActive {
+  border-color: var(--dsw-alias-label-primary);
+  background: var(--dsw-alias-bg-mask-1);
+}
+
+.modeLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dsw-alias-label-primary);
+}
+
+.modeHint {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--dsw-alias-label-secondary);
+}
+
+/* 原型 preview head: title plus the append-box reset. */
+.previewHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.clearExtraLink {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--dsw-alias-state-warn-primary);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.clearExtraLink:hover {
+  text-decoration: underline;
+}
+
+/* Free-form text appended to the assembled context before sending. */
+.extraInput {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  background: var(--dsw-specific-input-major);
+  color: var(--dsw-alias-label-primary);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.extraInput:focus {
+  outline: none;
+  border-color: var(--dsw-alias-state-warn-primary);
+}
+
+/* 开发 hand-off target readout, occupying the control band's left half. */
+.targetNotice {
+  flex: 1 1 auto;
+  align-self: center;
+  padding: 8px 12px;
+  border: 1px dashed var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+}
+
+/* Dispatched hand-off records: a collapsed row each, expanding to the message
+   exactly as it was sent. */
+.recordSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recordList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recordItem {
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  background: var(--dsw-specific-input-major);
+  overflow: hidden;
+}
+
+.recordHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+}
+
+.recordToggle {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+}
+
+.recordCaret {
+  flex: 0 0 auto;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 11px;
+}
+
+.recordTitle {
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.recordMeta {
+  flex: 0 0 auto;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+}
+
+.statusSelect {
+  flex: 0 0 auto;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  padding: 3px 6px;
+  background: var(--dsw-specific-input-major);
+  color: var(--dsw-alias-label-primary);
+  font-size: 12px;
+}
+
+.recordBody {
+  margin: 0;
+  padding: 10px 12px;
+  border-top: 1px solid var(--dsw-alias-border-l2);
+  background: var(--dsw-alias-bg-mask-1);
+  color: var(--dsw-alias-label-primary);
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Manual bug board rows. */
+.bugTitle {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-primary);
+  word-break: break-word;
+}
+
+.bugDetail {
+  padding: 0 10px 8px 10px;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* 上线: SSH connection form. */
+.serverPort {
+  flex: 0 0 110px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  padding: 7px 10px;
+  background: var(--dsw-specific-input-major);
+  color: var(--dsw-alias-label-primary);
+  font-size: 14px;
+}
+
+.secretNotice {
+  padding: 8px 12px;
+  border: 1px solid var(--dsw-alias-state-warn-primary);
+  border-radius: 8px;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Automatic-loop banner: pinned above the phase content, visible everywhere. */
+.loopBanner,
+.loopBannerBusy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  background: var(--dsw-alias-bg-mask-1);
+}
+
+.loopBannerBusy {
+  border-color: var(--dsw-alias-state-warn-primary);
+}
+
+.loopHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.loopTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dsw-alias-label-primary);
+}
+
+.loopSpacer {
+  flex: 1 1 auto;
+}
+
+.loopMessage {
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.loopSteps {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.loopStep {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.loopStepMark {
+  flex: 0 0 auto;
+  width: 12px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.loopStepLabel {
+  flex: 0 0 auto;
+  color: var(--dsw-alias-label-primary);
+}
+
+/* Delete confirmation. Sits above the expansion modal (z 1200) because a
+   delete can be triggered from inside it. */
+.confirmBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dsw-alias-bg-mask-1);
+}
+
+.confirmDialog {
+  width: min(420px, 86vw);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 14px;
+  background: var(--dsw-specific-input-major);
+  color: var(--dsw-alias-label-primary);
+  box-shadow: var(--dsw-shadow-lv2);
+}
+
+.confirmDetail {
+  margin-top: 6px;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.dangerButton {
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  background: var(--dsw-alias-state-error-primary);
+  color: var(--dsw-specific-input-major);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dangerButton:hover {
+  filter: brightness(1.06);
+}
+
+/* Resume a round that reported a turn without declaring itself finished. */
+.continueButton {
+  flex: 0 0 auto;
+  border: 1px solid var(--dsw-alias-state-warn-primary);
+  border-radius: 8px;
+  padding: 3px 10px;
+  background: transparent;
+  color: var(--dsw-alias-state-warn-primary);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.continueButton:hover {
+  background: var(--dsw-alias-bg-mask-1);
+}
+
+/* What settling a round did — bugs harvested, or a report that would not parse. */
+.recordNote {
+  flex: 0 0 auto;
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: var(--dsw-alias-border-l1);
+  color: var(--dsw-alias-state-warn-primary);
+  font-size: 12px;
+}
+
+/* What the last fix round concluded about one problem. */
+.bugNote {
+  padding: 0 10px 8px 10px;
+  color: var(--dsw-alias-state-warn-primary);
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* A feature point the 开发 round reported as implemented. */
+.pointDone {
+  flex: 0 0 auto;
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: var(--dsw-alias-border-l1);
+  color: var(--dsw-alias-state-warn-primary);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Why the last expansion attempt failed, on the requirement it belongs to. */
+.itemError {
+  display: block;
+  margin-top: 4px;
+  color: var(--dsw-alias-state-error-primary);
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* A settled problem (已修复 / 不修复): still readable, but it must not compete
+   with the outstanding work for attention. Dimmed rather than hidden — the
+   board is also the record of what was dealt with. */
+.recordItemSettled {
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 10px;
+  background: transparent;
+  overflow: hidden;
+  opacity: 0.55;
+}
+
+.recordItemSettled .bugTitle {
+  color: var(--dsw-alias-label-secondary);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}

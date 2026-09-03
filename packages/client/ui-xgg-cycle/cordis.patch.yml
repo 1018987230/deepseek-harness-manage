@@ -1,0 +1,14 @@
+# Bundle layer applied when a profile lists this package in dsh.profile.bundles.
+#
+# Standalone-install path only. Inside this repository the row already comes
+# from the dsh-web-app bundle, and a profile there never lists this package, so
+# this layer stays inert; installed out of tree it is what puts the plugin into
+# the composition. Either way the row carries the same id, so a composition that
+# somehow saw both would end up with one row rather than two.
+#
+# The plugin row references the package by NAME (not a relative source path) so
+# Node resolution finds the installed code. The browser half is discovered
+# separately, through this package's `dsh.client` manifest.
+- insert:
+    - id: ui-xgg-cycle
+      name: '@deepseek-ai/dsh-client-ui-xgg-cycle'

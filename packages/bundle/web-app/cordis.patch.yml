@@ -290,6 +290,9 @@
     - id: ui-user-questions
       name: '@deepseek-ai/dsh-client-ui-user-questions'
 
+    - id: ui-xgg-cycle
+      name: '@deepseek-ai/dsh-client-ui-xgg-cycle'
+
     - id: ui-trajectory
       name: '@deepseek-ai/dsh-client-ui-trajectory'
 
