@@ -70,7 +70,7 @@ The plugin prepends an `agent/pre-step` listener that runs only on the first ste
 | File | Role |
 |---|---|
 | [`src/index.ts`](src/index.ts) | Plugin entry: first-step listener, shell query, change suppression, scheduling |
-| [`src/invariant.ts`](src/invariant.ts) | Invariant companion for the snapshot contract |
+| — | No runtime invariant companion is published; a reading is a per-turn snapshot of external tmux state, so the session holds no cross-event relation to check; scheduling and format are owned by pipeline tests. |
 
 ### Main flow
 
@@ -85,7 +85,7 @@ At the first step of a turn, the listener checks whether an injection is due, qu
 
 Read these pages when the package-level contract is not enough. They move from the design decision to the executor the query runs through and the exhaustive configuration.
 
-- [Tmux location context decision record](../../../.agents/notes/implemented/feature/2026-07-27-tmux-location-context.md) — design rationale for the tty-based detection and reading shape.
+- [Tmux location context decision record](../../../.agents/notes/archived/feature/2026-07-27-tmux-location-context.md) — design rationale for the tty-based detection and reading shape.
 - [Shell subsystem](../../../docs/subsystems/shell.md) — the executor service the read-only query runs through.
 - [Context group map](../README.md) — sibling request-context packages.
 - [Generated configuration catalog](../../../docs/config-catalog.md#deepseek-aidsh-tmux-context) — every accepted config field and its source declaration.

@@ -1004,8 +1004,7 @@ export class ToolRuntime extends Service {
    * reads return the same flavor — but a reload that swapped in a second
    * language between them would hand a program written against one SDK to the
    * other. Binding it is deferred until a second backend ships (the first
-   * point it is testable); rationale in the
-   * [language-dispatch note](../../../../.agents/notes/implemented/feature/2026-07-31-ptc-language-dispatch.md).
+   * point it is testable).
    */
   private requireCodeRuntime(mode: ToolPresentationMode): CodeRuntime {
     const runtime = this.ctx.get('codeRuntime')
@@ -1128,9 +1127,9 @@ export class ToolRuntime extends Service {
    * A restriction filters what a scope inherits — the global layer and every
    * ancestor layer on its chain — and never what its OWN layer registers.
    * That exemption is what a per-child capability filter has to keep intact:
-   * the delegation runtime registers a child's reporting and structured-output
-   * tools into the child's own layer, and a filter naming the capabilities the
-   * child may use must not strip the machinery it answers through.
+   * the delegation runtime registers a child's structured-output tool into the
+   * child's own layer, and a filter naming the capabilities the child may use
+   * must not strip the machinery it answers through.
    *
    * Reading the exempt set as "the global layer" instead of "not mine" held
    * only while every model-facing tool sat in the host composition. Once

@@ -83,7 +83,7 @@ This section explains the design decisions behind the tools and points at the co
 | File | Role |
 |---|---|
 | [`src/index.ts`](src/index.ts) | Plugin entry: tool registrations, completion listener, prompt section, output capping |
-| [`src/invariant.ts`](src/invariant.ts) | Invariant companion (no runtime invariant; execution relations are owned by the capability seam) |
+| — | No runtime invariant companion is published; this model-facing adapter has no independent lifecycle stream; execution relations are owned by the capability seam it calls. |
 
 ### Output capping
 
@@ -108,7 +108,7 @@ Read these pages when the package-level contract is not enough. They move from t
 - [Process-local registry](../jobs-local/README.md) — where jobs run in this process.
 - [Generated tool catalog](../../../docs/tool-catalog.md#deepseek-aidsh-tool-jobs) — the exact `job_output`, `job_list`, and `job_kill` schemas.
 - [Generated configuration catalog](../../../docs/config-catalog.md#deepseek-aidsh-tool-jobs) — every accepted config field and its source declaration.
-- [job-registry seam Agent Note](../../../.agents/notes/implemented/architecture/2026-07-26-job-registry-seam.md) — the owner-fenced registry contract and its rationale.
+- [job-registry seam Agent Note](../../../.agents/notes/archived/architecture/2026-07-26-job-registry-seam.md) — the owner-fenced registry contract and its rationale.
 
 -----
 

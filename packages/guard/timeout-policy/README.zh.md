@@ -77,7 +77,7 @@ kind: "package-reference"
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | 插件入口：`TOOL_TIMEOUT`、`name`／`inject`／`apply`、`tools/execute` 包装层 |
-| [`src/invariant.ts`](src/invariant.ts) | 不变式伴生插件（无运行时不变式：无状态包装层不拥有包级事件历史） |
+| — | 不发布运行时不变式伴生入口；无状态包装层不拥有包级事件历史。 |
 
 </details>
 
@@ -130,6 +130,6 @@ kind: "package-reference"
 
 本开发备注是维护者的工作上下文：开放问题与尚未决定的探索方向。它明确不具权威性——已交付的行为、限制与既定理由以上文、包代码和相关 Agent Note 为准。
 
-`src/index.ts` 中的 FIXME 要求确定 `@deepseek-ai/dsh-timeout-guard` 改名；[改名台账](../../../.agents/notes/implemented/architecture/2026-08-11-repository-naming-contract-and-rename-ledger.zh.md) 已把 `@deepseek-ai/dsh-tool-call-timeout-policy` 记录为既定名称，因此该 FIXME 已陈旧，待代码清理。
+`src/index.ts` 中的 FIXME 要求确定 `@deepseek-ai/dsh-timeout-guard` 改名；[改名台账](../../../.agents/notes/archived/architecture/2026-08-11-repository-naming-contract-and-rename-ledger.md) 已把 `@deepseek-ai/dsh-tool-call-timeout-policy` 记录为既定名称，因此该 FIXME 已陈旧，待代码清理。
 
 </details>

@@ -67,7 +67,7 @@ These pages cover the suggestion machinery, the reference seams, and the input p
 - [ui-input-trigger](../ui-input-trigger/README.md) — the inline suggestion machinery the source registers into.
 - [file-reference](../../context/file-reference/README.md) — the `@file` seam and its provider contract.
 - [session-reference](../../context/session-reference/README.md) — the `@session` seam and prepared snapshot semantics.
-- [Web input machine and slash pipeline](../../../.agents/notes/implemented/architecture/2026-07-25-web-input-machine-and-slash-pipeline.md) — how references and commands share the input machine.
+- [Web input machine and slash pipeline](../../../.agents/notes/archived/architecture/2026-07-25-web-input-machine-and-slash-pipeline.md) — how references and commands share the input machine.
 
 -----
 
@@ -100,3 +100,5 @@ These limits define when the reference source cannot help; they are current pack
 None.
 
 </details>
+
+**Runtime invariant:** No companion is published. A single slash-source registration whose disposal is proven by the HMR-safety spec — it emits no cordis events and owns no cross-plugin mutable state.

@@ -47,7 +47,7 @@ Removing the package withdraws the provider and its private runtime closure on t
 | `model` | native Codex settings | Optional non-empty model name fixed for every thread from this provider instance; omission sends no app-server override |
 | `env` | `{}` | Explicit child environment layered over the credential-scrubbed parent environment |
 | `permissionMode` | `never` | Native non-interactive approval and sandbox mode fixed for every thread from this provider instance |
-| `disposeGraceMs` | `3000` | Grace between the shared process-tree owner's termination tiers |
+| `disposeGraceMs` | `3000` | Grace between the shared managed-range owner's termination tiers |
 
 | `permissionMode` value | `thread/start` fields | Native behavior |
 |---|---|---|
@@ -191,3 +191,5 @@ This Dev Note is working context for maintainers: open questions and undecided d
 - **Version-pinned protocol** — the runtime dependency is pinned to `@openai/codex@0.149.1`; upgrading requires regenerating the upstream schema evidence and rerunning the credentialed nonce tests.
 
 </details>
+
+**Runtime invariant:** No companion is published. Lifecycle pairing belongs to the shared subagent service, and managed-range ownership belongs to the subprocess service.

@@ -67,7 +67,7 @@ kind: "package-reference"
 - [ui-input-trigger](../ui-input-trigger/README.zh.md)——该 source 注册进的行内建议机制。
 - [file-reference](../../context/file-reference/README.zh.md)——`@file` seam 及其提供方约定。
 - [session-reference](../../context/session-reference/README.zh.md)——`@session` seam 与准备后快照的语义。
-- [Web 输入机器与 slash 流水线](../../../.agents/notes/implemented/architecture/2026-07-25-web-input-machine-and-slash-pipeline.zh.md)——引用与命令如何共享输入机器。
+- [Web 输入机器与 slash 流水线](../../../.agents/notes/archived/architecture/2026-07-25-web-input-machine-and-slash-pipeline.md)——引用与命令如何共享输入机器。
 
 -----
 
@@ -100,3 +100,5 @@ kind: "package-reference"
 无。
 
 </details>
+
+**运行时不变式：** 不发布伴生入口。插件只注册一个 slash source，HMR 测试覆盖释放；它不发出 Cordis 事件，也不持有跨插件可变状态。

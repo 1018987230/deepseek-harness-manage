@@ -93,7 +93,7 @@ export interface Config {
 | [`src/render.ts`](src/render.ts) | 指令渲染、预算截断、变更记录 |
 | [`src/state.ts`](src/state.ts) | 持久消息来源、版本／digest 缓存、对账 |
 | [`src/digest.ts`](src/digest.ts) | SHA-1 内容标识与每目录重复键 |
-| [`src/invariant.ts`](src/invariant.ts) | 持久上下文约定的不变式伴生插件 |
+| — | 不发布运行时不变式伴生入口；回放会容忍未知或格式错误的 workspace source，私有 pending/cache 状态转换由聚焦 pipeline 测试覆盖。 |
 
 ### 主要流程
 
@@ -113,7 +113,7 @@ export interface Config {
 包级约定不够用时阅读以下页面。它们从指令文件格式逐步进入设计决策与穷尽式配置。
 
 - [文档标准](../../../docs/AGENTS.md)——`AGENTS.md` 指令文件包含什么、如何维护。
-- [工作区上下文决策记录](../../../.agents/notes/implemented/feature/2026-06-24-workspace-context.zh.md)——按 agent／会话隔离与生命周期理由。
+- [工作区上下文决策记录](../../../.agents/notes/archived/feature/2026-06-24-workspace-context.md)——按 agent／会话隔离与生命周期理由。
 - [context 组地图](../README.zh.md)——相邻的请求上下文包。
 - [生成的配置目录](../../../docs/config-catalog.zh.md#deepseek-aidsh-agent-instructions)——每个受支持配置字段及其源声明。
 

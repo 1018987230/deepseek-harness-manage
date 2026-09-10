@@ -105,7 +105,7 @@ const footer = formatRetentionNotice(
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | `ItemRetainer`、`TextRetainer`、`describeOmitted` 与 `formatRetentionNotice` |
-| [`src/invariant.ts`](src/invariant.ts) | 不变式伴生插件（无运行时不变式；保留运算由单元测试覆盖） |
+| — | 不发布运行时不变式伴生入口；保留运算由单元测试覆盖。 |
 
 ### 两个 retainer，两种资源模型
 
@@ -128,7 +128,6 @@ const footer = formatRetentionNotice(
 
 当你需要消费方或库背后的边界决策时，阅读以下页面。
 
-- [工具结果保留库 Agent Note](../../../.agents/notes/implemented/architecture/2026-07-06-tool-result-retention-library.zh.md)——库围绕工具语义划定的边界。
 - [spill 策略](../../spill/spill-policy/README.zh.md)——组合 `TextRetainer`，围绕 spill 文件通知构建有界预览。
 - [spill 子系统](../../../docs/subsystems/spill.zh.md)——本库预览机制所服务的 spill 词汇。
 - [文件搜索工具](../../fs/tool-fs-search/README.zh.md)——为 spill 收集完整结果的 `ItemRetainer` 消费方。

@@ -74,7 +74,7 @@ The seam is built on one separation: the interaction shape a backend provides is
 
 Read these when the seam contract is not enough: the decision record first, then the two backends and the adaptive chooser that compose it.
 
-- [Directory-picker capability seam decision](../../../.agents/notes/implemented/architecture/2026-07-28-directory-picker-capability-seam.md) — design rationale, the `ctx.fs` separation, and the policy decisions.
+- [Directory-picker capability seam decision](../../../.agents/notes/archived/architecture/2026-07-28-directory-picker-capability-seam.md) — design rationale, the `ctx.fs` separation, and the policy decisions.
 - [Native backend](../directory-picker-native/README.md) — the OS-chooser interaction and its platform tooling.
 - [Browse backend](../directory-picker-browse/README.md) — the in-app listing and creation interaction for remote clients.
 - [Adaptive chooser](../directory-picker-auto/README.md) — boot-time resolution between the two backends.
@@ -109,3 +109,5 @@ These limits define when the seam contract leaves a decision to a future consume
 None.
 
 </details>
+
+**Runtime invariant:** No companion is published. This stateless Service Definition owns the capability vocabulary, while backends and the Remote controller own observations.

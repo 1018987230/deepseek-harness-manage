@@ -70,7 +70,7 @@ kind: "package-reference"
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | 插件入口：第一步监听器、shell 查询、变化抑制、调度 |
-| [`src/invariant.ts`](src/invariant.ts) | 快照约定的不变式伴生插件 |
+| — | 不发布运行时不变式伴生入口；每次读取都是外部 tmux 状态的单轮快照，Session 没有可检查的跨事件关系；调度与格式由 pipeline 测试负责。 |
 
 ### 主要流程
 
@@ -85,7 +85,7 @@ kind: "package-reference"
 
 包级约定不够用时阅读以下页面。它们从设计决策进入查询所经由的执行器与穷尽式配置。
 
-- [tmux 位置上下文决策记录](../../../.agents/notes/implemented/feature/2026-07-27-tmux-location-context.zh.md)——基于 tty 的检测与读数形状的设计理由。
+- [tmux 位置上下文决策记录](../../../.agents/notes/archived/feature/2026-07-27-tmux-location-context.md)——基于 tty 的检测与读数形状的设计理由。
 - [shell 子系统](../../../docs/subsystems/shell.zh.md)——只读查询所经由的执行器服务。
 - [context 组地图](../README.zh.md)——相邻的请求上下文包。
 - [生成的配置目录](../../../docs/config-catalog.zh.md#deepseek-aidsh-tmux-context)——每个受支持配置字段及其源声明。

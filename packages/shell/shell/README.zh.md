@@ -38,7 +38,7 @@ console.log(result.exitCode, result.stdout.text)
 
 ### 后台进程
 
-用已解析的 spec 调用 `start` 即可启动后台进程；它会立即返回句柄，且不应用任何超时。用 `readOutput()` 增量读取输出——连续读取绝不会重复交付，有损读取会指向完整流的 spill 文件。用 `kill()` 终止进程组（进程结束后返回 `false`），并等待 `done` 结算。job id、所有权、轮询与通知属于通用 `ctx.jobs` 运行时，工具层会把句柄注册进去。
+用已解析的 spec 调用 `start` 即可启动后台进程；它会立即返回句柄，且不应用任何超时。用 `readOutput()` 增量读取输出——连续读取绝不会重复交付，有损读取会指向完整流的 spill 文件。用 `kill()` 终止提供方管理的 range（直接命令结束后返回 `false`），并等待 `done` 完成直接命令结算。job id、所有权、轮询与通知属于通用 `ctx.jobs` 运行时，工具层会把句柄注册进去。
 
 ### 请求与已解析 spec
 
@@ -83,7 +83,7 @@ seam 本身不是执行器：每个组合只挂载一个提供方，工具即可
 | [`src/index.ts`](src/index.ts) | 插件入口：抽象 `ShellExecutor` 服务与共享设置命名空间 |
 | [`src/types.ts`](src/types.ts) | 请求/spec 词汇、`ShellRunResult`、`ShellProcess` 与沙箱事实 |
 | [`src/render.ts`](src/render.ts) | `parseExitStatus`：shell 工具共享的退出状态标记约定 |
-| [`src/invariant.ts`](src/invariant.ts) | 不变式伴生插件（无运行时不变式；执行器与策略负责观察） |
+| — | 不发布运行时不变式伴生入口；执行器与策略负责观察。 |
 
 ### 设置命名空间
 
@@ -91,7 +91,7 @@ seam 本身不是执行器：每个组合只挂载一个提供方，工具即可
 
 ### 后台生命周期与归属
 
-后台进程属于 subprocess 服务而非执行器：它能在仅重载执行器后存活，并在组合拆解时被终止并 join。实现必须遵守 seam 的语义——`run` 只在基础设施失败时 reject；`start` 立即返回且不设超时，其 `done` 绝不 reject（spawn 失败以 `killed` 结算，错误进入 stderr）；`readOutput` 是消费式的，有损读取会报告 spill 文件。
+后台进程属于 subprocess 服务而非执行器：它能在仅重载执行器后存活，并在组合拆解时被终止并 join。实现必须遵守 seam 的语义——`run` 只在基础设施失败时 reject；`start` 立即返回且不设超时，其 `done` 绝不 reject（subprocess provider rejection 以 `killed` 结算，并把不声明阶段的错误写入 stderr）；`readOutput` 是消费式的，有损读取会报告 spill 文件。
 
 </details>
 

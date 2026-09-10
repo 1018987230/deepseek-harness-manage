@@ -77,7 +77,7 @@ Multiple `tools/execute` listeners compose by Cordis registration order, which c
 | File | Role |
 |---|---|
 | [`src/index.ts`](src/index.ts) | Plugin entry: `TOOL_TIMEOUT`, `name`/`inject`/`apply`, the `tools/execute` wrapper |
-| [`src/invariant.ts`](src/invariant.ts) | Invariant companion (no runtime invariant: the stateless wrapper owns no package-local event history) |
+| — | No runtime invariant companion is published; this stateless policy plugin owns no package-local event history or mutable data relation beyond the seam it intercepts. |
 
 </details>
 
@@ -130,6 +130,6 @@ These limits define when the policy is a poor fit. They are current package cons
 
 This Dev Note is working context for maintainers: open questions and directions that are not decided. It is explicitly non-authoritative — shipped behavior, limits, and accepted rationale live in the sections above, the package code, and the linked Agent Notes.
 
-The `src/index.ts` FIXME asks to settle a `@deepseek-ai/dsh-timeout-guard` rename; the [naming ledger](../../../.agents/notes/implemented/architecture/2026-08-11-repository-naming-contract-and-rename-ledger.md) already records `@deepseek-ai/dsh-tool-call-timeout-policy` as the decided name, so the FIXME is stale pending a code cleanup.
+The `src/index.ts` FIXME asks to settle a `@deepseek-ai/dsh-timeout-guard` rename; the [naming ledger](../../../.agents/notes/archived/architecture/2026-08-11-repository-naming-contract-and-rename-ledger.md) already records `@deepseek-ai/dsh-tool-call-timeout-policy` as the decided name, so the FIXME is stale pending a code cleanup.
 
 </details>

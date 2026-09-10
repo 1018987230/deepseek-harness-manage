@@ -77,7 +77,7 @@ agent（智能体）可以在会话期间发现并加载 skill（技能）：在
 | 文件 | 职责 |
 |---|---|
 | [`src/index.ts`](src/index.ts) | 插件入口：工具注册、目录与手势 pre-step 监听器、渲染与 digest |
-| [`src/invariant.ts`](src/invariant.ts) | 不变式伴生插件 |
+| — | 不发布运行时不变式伴生入口；这个模型侧 adapter 没有独立 lifecycle stream；执行关系由它调用的 capability seam 负责。 |
 
 ### 目录生命周期
 
@@ -99,8 +99,7 @@ agent（智能体）可以在会话期间发现并加载 skill（技能）：在
 - [skill 子系统参考](../../../docs/subsystems/skills.zh.md)——目录背后的注册表与提供方词汇。
 - [skill 包](../skill/README.zh.md)——注册表与共享的 `renderSkillContent` 渲染。
 - [生成工具目录](../../../docs/tool-catalog.zh.md#deepseek-aidsh-tool-skill)——模型接收的精确 `skill` schema。
-- [skill 目录热刷新 Agent Note](../../../.agents/notes/implemented/feature/2026-07-27-skill-catalog-hot-refresh.zh.md)——持久初始目录与替换生命周期。
-- [用户显式 skill 调用 Agent Note](../../../.agents/notes/implemented/feature/2026-08-08-user-explicit-skill-invocation.zh.md)——`/name` 手势设计。
+- [用户显式 skill 调用 Agent Note](../../../.agents/notes/archived/feature/2026-08-08-user-explicit-skill-invocation.md)——`/name` 手势设计。
 
 -----
 

@@ -89,7 +89,7 @@ Read these pages when the package-level contract is not enough. They move from t
 - [Host runner](../cordis-host-runner/README.md) — the inventory and lifecycle verbs behind the panel.
 - [Tool package](../tool-cordis/README.md) — the model-facing tools whose calls these cards render.
 - [Extensions subsystem](../../../docs/subsystems/extensions.md) — the generated `ctx.dynamicCordisRunner` API and forwarded `cordis/*` events.
-- [Dynamic client render and attachment ownership Agent Note](../../../.agents/notes/implemented/architecture/2026-08-17-dynamic-client-render-and-attachment-ownership.md) — how slot-registered browser UI is owned by its package.
+- [Slots subsystem](../../../docs/subsystems/slots.md) — how slot-registered browser UI is owned by its package.
 
 -----
 
@@ -126,3 +126,5 @@ These limits define where the surfaces need special care. They are current packa
 None.
 
 </details>
+
+**Runtime invariant:** No companion is published. A single keyed toolview registration whose disposal is proven by the HMR-safety spec. The one mutable relation this package owns — the per-definition run-state observable — lives in the browser process, out of reach of the host invariant service, and the node half emits no cordis events and holds no cross-plugin state.

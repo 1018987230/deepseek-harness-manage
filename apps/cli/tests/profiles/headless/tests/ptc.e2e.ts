@@ -55,7 +55,7 @@ async function ptcModeHarness(cwd: string): Promise<Context> {
   await harness.plugin(LlmRuntime)
   await harness.plugin(SessionStore)
   await harness.plugin(SessionProjectionRegistry)
-  await harness.plugin(SystemPrompt, { persona: PERSONA })
+  await harness.plugin(SystemPrompt, { personaPrefix: PERSONA })
   await harness.plugin(ToolRuntime, { mode: 'ptc' })
   await harness.plugin(AgentRegistry)
   await harness.plugin(AgentLoop, { agents: [] })
@@ -73,7 +73,7 @@ async function workspacePtcModeHarness(): Promise<Context> {
   await harness.plugin(LlmRuntime)
   await harness.plugin(SessionStore)
   await harness.plugin(SessionProjectionRegistry)
-  await harness.plugin(SystemPrompt, { persona: PERSONA })
+  await harness.plugin(SystemPrompt, { personaPrefix: PERSONA })
   await harness.plugin(ToolRuntime, { mode: 'ptc' })
   await harness.plugin(AgentRegistry)
   await harness.plugin(LocalFileSystem, { cwd: '/' })
@@ -356,7 +356,7 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY)('PTC mode: real model writes a pr
   it('collapses the wire tool list to [run_code], bridges sub-calls, and returns curated output', async () => {
     workdir = await mkdtemp(join(tmpdir(), 'dsh-ptc-e2e-'))
     ctx = await ptcModeHarness(workdir)
-    const agent = ctx.agentLoop.create(SessionId('e2e-ptc'), { provider: 'deepseek-official', model: 'deepseek-v4-flash' })
+    const agent = await ctx.agentLoop.create(SessionId('e2e-ptc'), { provider: 'deepseek-official', model: 'deepseek-v4-flash' })
 
     agent.followup(createUserMessage({
       content: [{
@@ -366,7 +366,7 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY)('PTC mode: real model writes a pr
         + 'and return only the joined string.',
       }], source: { kind: 'user' } }))
     await waitForIdle(ctx, agent)
-    const events: SessionEvent[] = [...agent.session.events]
+    const events: readonly SessionEvent[] = agent.session.snapshotEvents()
 
     // The wire contract: every request this session made offered EXACTLY ONE
     // tool — run_code (the logged header snapshots the assembled list).
@@ -418,11 +418,11 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY)('PTC mode: real model writes a pr
       }], source: { kind: 'user' } }))
     await waitForIdle(ctx, handle.agent)
 
-    const events: SessionEvent[] = [...handle.agent.session.events]
+    const events: readonly SessionEvent[] = handle.agent.session.snapshotEvents()
     const dispatch = events.find(event => event.type === 'tool/code-dispatch' && event.data.name === 'read')
     const outerResult = events.find(event => event.type === 'tool/result')
     const workspaceContext = await vi.waitFor(() => {
-      const splice = handle.agent.session.events.findLast(event => event.type === 'agent/inbox/spliced'
+      const splice = handle.agent.session.snapshotEvents().findLast(event => event.type === 'agent/inbox/spliced'
         && event.data.inserted.some(message => message.source.kind === 'agent-instructions'))
       const inserted = splice?.type === 'agent/inbox/spliced'
         ? splice.data.inserted.find(message => message.source.kind === 'agent-instructions')
