@@ -322,6 +322,30 @@ export const PROTOTYPE_MODES: readonly PrototypeModeSpec[] = [SIMPLE_MODE, FULL_
 const UNATTENDED_RULE =
   '全程无人值守：不要停下来问我任何问题、不要等我确认、不要给选项让我挑。信息不足时自己选一个主流稳妥的方案直接做完，把做了什么假设写在总结里，我事后看总结。'
 
+type ProjectOrientationMode = 'planning' | 'working' | 'testing' | 'deployment'
+
+/**
+ * Add the repository-orientation step that precedes every project round.
+ * @param lines - the message under construction (mutated).
+ * @param mode - the phase-specific authority after the inspection completes.
+ */
+function pushProjectOrientation(lines: string[], mode: ProjectOrientationMode): void {
+  const authority = mode === 'planning'
+    ? '本轮只做只读梳理和需求规划：可以读取文件并运行不改变项目状态的检查命令，但不要修改、创建或删除项目文件。'
+    : mode === 'testing'
+      ? '梳理后可以启动项目并运行测试，但这一轮只报告问题，不修改项目源文件。'
+      : mode === 'deployment'
+        ? '先完成本地项目梳理，再检查部署目标；确认构建方式、运行依赖和现有部署配置后才执行部署。'
+        : '完成梳理并明确增量范围后才修改文件；不要在尚未理解现有实现时开始重写。'
+  lines.push('', '【项目梳理】（先完成，再开始本轮任务）')
+  lines.push('1. 先查找并读取适用于当前工作区的 AGENTS.md、README、项目说明、package/build 清单，再查看目录结构。')
+  lines.push('2. 定向读取与本轮需求有关的源码、配置和测试，并检查 git status；现有未提交改动属于用户，必须保留，不得覆盖、回滚或改写。')
+  lines.push('3. 开始本轮操作前先形成《项目现状梳理》，写明技术栈、启动与构建入口、相关模块、已经实现的能力、约束和本轮缺口；最终回复先给出这份梳理，再给出本轮结果。不要只做梳理就结束本轮。')
+  lines.push('4. 现有实现与仓库约定优先于下面面向新项目的默认选型。已有能力只补缺口并沿用现有结构；只有确认工作区没有可用实现时才从零搭建。')
+  lines.push('5. 如果本会话前文已有项目梳理，先核对工作区是否变化；未变化时简短确认并继续，不要重复猜测或重新搭建。')
+  lines.push(authority)
+}
+
 /**
  * Built-in rules carried by every hand-off regardless of shape. The framework
  * line is phrased as a default rather than resolved here on purpose: 基础信息
@@ -497,7 +521,10 @@ export function buildExpandPrompt(
   requirements: readonly Requirement[],
   existing: readonly RequirementGroup[] = [],
 ): string {
-  const lines: string[] = ['【基础信息】']
+  const lines: string[] = ['【这条会话是做什么的】']
+  lines.push('这是本项目的「需求规划」会话。先只读梳理当前仓库，再把需求拆成基于项目现状的增量功能点；不要写代码或修改文件。')
+  pushProjectOrientation(lines, 'planning')
+  lines.push('', '【基础信息】')
   lines.push(...(info.length === 0 ? ['（无）'] : info.map(entry => `${entry.key}: ${entry.value}`)))
   if (existing.length > 0) {
     lines.push('', '【已有功能点】（之前的需求已经确认过的；这是项目现状，不是要你重做的东西）')
@@ -508,8 +535,6 @@ export function buildExpandPrompt(
       }
     }
   }
-  lines.push('', '【这条会话是做什么的】')
-  lines.push('这是本项目的「需求规划」会话，只用来把需求拆成功能点。代码在另一条会话里开发，可能正在跑 —— 你不要写代码、不要改文件、不要碰仓库，只输出功能点。')
   lines.push('', existing.length > 0 ? '【本次新增的需求】' : '【需求列表】')
   requirements.forEach((req, position) => { lines.push(`${position + 1}. ${req.text}`) })
   lines.push('', existing.length > 0
@@ -898,6 +923,7 @@ export function buildPrototypeContext(
   lines.push('')
   if (!continuing) lines.push(...historyLedger(records), '')
   lines.push(...baseSections(info, requirements, groups))
+  pushProjectOrientation(lines, 'working')
   const spec = PROTOTYPE_MODES.find(item => item.id === mode) ?? SIMPLE_MODE
   lines.push('', '【开发约定】（内置要求，务必逐条遵守）')
   lines.push(`交付类型：${spec.label} —— ${spec.hint}`)
@@ -945,6 +971,7 @@ export function buildDevelopContext(
   lines.push(baseVersion === undefined
     ? '这一轮直接进入正式开发阶段，把上面的需求与功能点做成一个完整的工程项目。'
     : `这一轮基于原型 v${baseVersion} 进入正式开发阶段，把它做成一个完整的工程项目；产出请标记为对应原型 v${baseVersion}。`)
+  pushProjectOrientation(lines, 'working')
   lines.push('', '【开发约定】（内置要求，务必逐条遵守）')
   let index = 1
   for (const rule of [UNATTENDED_RULE, ...DEVELOP_RULES]) lines.push(`${index++}. ${rule}`)
@@ -1021,6 +1048,7 @@ export function buildTestContext(
     ? `【测试 · 第 ${round} 轮】`
     : `【测试 · 基于原型 v${baseVersion} · 第 ${round} 轮】`)
   lines.push('对当前实现做一轮自动测试，把发现的问题列出来。')
+  pushProjectOrientation(lines, 'testing')
   lines.push('', '【测试约定】（内置要求，务必逐条遵守）')
   let index = 1
   for (const rule of [UNATTENDED_RULE, ...TEST_RULES]) lines.push(`${index++}. ${rule}`)
@@ -1081,6 +1109,7 @@ export function buildReleaseContext(
     lines.push(`密码: ${password === '' ? '（未填，请先问我）' : maskSecret ? '********' : password}`)
     lines.push(`部署目录: ${shown(server.path, '（未填，请先问我）')}`)
   }
+  pushProjectOrientation(lines, 'deployment')
   lines.push('', '【上线约定】（内置要求，务必逐条遵守）')
   let index = 1
   for (const rule of [UNATTENDED_RULE, ...spec.rules]) lines.push(`${index++}. ${rule}`)
@@ -1116,6 +1145,7 @@ export function buildFixContext(
     lines.push(`   标题：${bug.title}`)
     if (bug.detail.trim() !== '') lines.push(`   说明：${bug.detail.trim()}`)
   }
+  pushProjectOrientation(lines, 'working')
   lines.push('', '【修复约定】（内置要求，务必逐条遵守）')
   let index = 1
   for (const rule of [UNATTENDED_RULE, ...FIX_RULES]) lines.push(`${index++}. ${rule}`)

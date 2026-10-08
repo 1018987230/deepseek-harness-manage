@@ -159,6 +159,38 @@ describe('llm-pi-ai real dormant composition', () => {
     expect(server.headers[0]?.['user-agent']).toBe(userAgent())
   })
 
+  it('sends the active session identity through an OpenCode Go route loaded from settings', async () => {
+    vi.stubEnv('PI_COMPOSITION_KEY', '')
+    const server = await mockServer([
+      { status: 401, body: '{"error":{"message":"expected mock failure"}}' },
+    ])
+    const { ctx, settingsPath } = await loadComposition()
+
+    await writeFile(settingsPath, [
+      'llm-pi-ai:',
+      '  providers:',
+      '    opencode-go:',
+      '      apiKeyEnv: PI_COMPOSITION_KEY',
+      `      baseURL: ${server.url}`,
+      '      headers:',
+      '        X-OpenCode-Session: stale-profile-value',
+      '',
+    ].join('\n'))
+    await vi.waitFor(() => {
+      expect(ctx.llm.listProviders().map(provider => provider.id)).toEqual(['opencode-go'])
+    }, { timeout: 5000 })
+
+    await assemble(ctx, {
+      provider: 'opencode-go',
+      model: 'qwen3.8-flash',
+      messages: [],
+      sessionId: 'loader-session' as never,
+    })
+
+    expect(server.paths).toEqual(['/v1/messages?beta=true'])
+    expect(server.headers[0]?.['x-opencode-session']).toBe('loader-session')
+  })
+
   it('continues natively after max-token assembly drops a tool call, with pruned replay metadata', async () => {
     vi.stubEnv('PI_COMPOSITION_KEY', '')
     const server = await mockServer([

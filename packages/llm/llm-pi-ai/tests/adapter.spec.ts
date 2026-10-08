@@ -123,6 +123,41 @@ describe('PiAiAdapter provider routing', () => {
     expect(server.headers[0]?.['user-agent']).toBe(userAgent())
   })
 
+  it('sends the live Harness session identity on every OpenCode Go protocol', async () => {
+    const server = await mockServer([
+      { status: 401, body: '{"error":{"message":"expected mock failure"}}' },
+      { status: 401, body: '{"error":{"message":"expected mock failure"}}' },
+    ])
+    const ctx = new Context()
+    await ctx.plugin(LlmRuntime)
+    await ctx.plugin(LlmPiAi, {
+      providers: {
+        'opencode-go': {
+          apiKeyEnv: 'PI_TEST_KEY',
+          baseURL: server.url,
+          headers: { 'X-OpenCode-Session': 'stale-profile-value' },
+        },
+      },
+    })
+
+    await assemble(ctx, {
+      provider: 'opencode-go',
+      model: 'qwen3.8-flash',
+      messages: [],
+      sessionId: 'anthropic-session' as never,
+    })
+    await assemble(ctx, {
+      provider: 'opencode-go',
+      model: 'kimi-k2.6',
+      messages: [],
+      sessionId: 'openai-session' as never,
+    })
+
+    expect(server.paths).toEqual(['/v1/messages?beta=true', '/chat/completions'])
+    expect(server.headers.map(headers => headers['x-opencode-session']))
+      .toEqual(['anthropic-session', 'openai-session'])
+  })
+
   it('forwards common stream options and profile reasoning', async () => {
     const server = await mockServer([{ events: textEvents }])
     const ctx = await harness(server.url, {

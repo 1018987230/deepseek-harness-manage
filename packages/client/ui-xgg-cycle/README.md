@@ -40,7 +40,7 @@ The Bundle patch inserts the `ui-xgg-cycle` row. Its browser half requires the S
 
 ### What you get
 
-The panel keeps separate project state for each Workspace. Manual phase actions reuse a live project Session where continuity matters; requirement expansion uses a separate planning Session so it cannot queue behind a long build. The unattended workflow generates feature points, builds a versioned prototype, develops it, and alternates test and fix rounds until no P0/P1 issue remains or five fix rounds complete. Server passwords stay outside browser persistence but enter the durable Session message when direct-server deployment is dispatched.
+The panel keeps separate project state for each Workspace. Every planning or delivery round first instructs the agent to read the repository instructions, project documentation, manifests, relevant source and tests, and Git status; the agent summarizes the current implementation before proposing features or changing files. Manual phase actions reuse a live project Session where continuity matters; requirement expansion uses a separate planning Session so it cannot queue behind a long build. The unattended workflow generates feature points, builds a versioned prototype, develops it, and alternates test and fix rounds until no P0/P1 issue remains or five fix rounds complete. Server passwords stay outside browser persistence but enter the durable Session message when direct-server deployment is dispatched.
 
 -----
 
@@ -80,11 +80,11 @@ The browser plugin registers the same component in `conversation.session.header.
 
 #### What the model sees
 
-Each dispatched phase becomes an ordinary user message in the selected Session. The package assembles current project facts, requirements, confirmed feature points, applicable implementation or deployment rules, unresolved manual issues, and a JSON reply contract for the phase. A completed round reports `{"roundComplete":true}` beside its phase result; continuation messages ask the same Session to finish a round that omitted that marker.
+Each dispatched phase becomes an ordinary user message in the selected Session. The package assembles a repository-orientation instruction, current project facts, requirements, confirmed feature points, applicable implementation or deployment rules, unresolved manual issues, and a JSON reply contract for the phase. The orientation requires a current-state summary before phase work, protects uncommitted user changes, makes an existing implementation override new-project defaults, and limits requirement planning to read-only inspection. A completed round reports `{"roundComplete":true}` beside its phase result; continuation messages ask the same Session to finish a round that omitted that marker.
 
 #### Token effect
 
-Every dispatch adds the complete assembled phase message to the selected Session and retains the assistant reply. Repeated rounds therefore add their current project ledger and phase-specific instructions again; no hidden prompt section or tool schema is registered.
+Every dispatch adds the complete assembled phase message, including the orientation instructions, to the selected Session and retains the assistant reply. Repeated rounds therefore add their current project ledger and phase-specific instructions again; a reused Session may confirm that the repository is unchanged instead of repeating a full survey. No hidden prompt section or tool schema is registered.
 
 #### KV Cache effect
 

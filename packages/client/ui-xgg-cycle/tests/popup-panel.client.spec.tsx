@@ -11,7 +11,7 @@ import { zh } from '../src/client/locale.ts'
 
 afterEach(cleanup)
 
-function controller(): PanelController {
+function controller(expandOne = vi.fn(() => Promise.resolve())): PanelController {
   const state: PanelState = {
     activeKey: 'workspace-1',
     projects: {
@@ -38,7 +38,7 @@ function controller(): PanelController {
     handOff: vi.fn(() => Promise.resolve('session-1')),
     trackRecord: vi.fn(),
     continueRound: vi.fn(() => Promise.resolve()),
-    expandOne: vi.fn(() => Promise.resolve()),
+    expandOne,
     runToPrototype: vi.fn(),
     runFromDevelop: vi.fn(),
     stopLoop: vi.fn(),
@@ -50,7 +50,9 @@ function controller(): PanelController {
 
 describe('PopupPanel', () => {
   it('opens the workflow, records project information, and adds a requirement', () => {
-    render(<PopupPanel controller={controller()} t={makeTranslate(zh)} />)
+    const expandOne = vi.fn(() => Promise.resolve())
+    const panelController = controller(expandOne)
+    render(<PopupPanel controller={panelController} t={makeTranslate(zh)} />)
 
     fireEvent.click(screen.getByRole('button', { name: '需求面板' }))
     expect(screen.getByRole('dialog', { name: '项目流程面板' })).toBeTruthy()
@@ -71,5 +73,7 @@ describe('PopupPanel', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: '添加' }))
     expect(screen.getByText('开发一个 CRM')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '梳理项目并扩展需求' }))
+    expect(expandOne).toHaveBeenCalledTimes(1)
   })
 })

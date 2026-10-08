@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/client/ui-xgg-cycle/README.md
-README.md: ab872b1d9102dbe1148a42e91e132a7943b0e59a
-README.zh.md: 2bbb225d0bfcaa06e14f1ebfa8b33e26ab2be9de
+README.md: 93b951d55b63b979af9644ebacaa6fbeacc7bcb5
+README.zh.md: ac919f874b808e4b1bdae5d160e7d70ab8ef147e

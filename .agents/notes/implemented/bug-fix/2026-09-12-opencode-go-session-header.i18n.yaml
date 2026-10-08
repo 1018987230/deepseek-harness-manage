@@ -1,0 +1,6 @@
+# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
+# side as of the last confirmed-consistent state. Both languages carry equal authority;
+# after editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write .agents/notes/implemented/bug-fix/2026-09-12-opencode-go-session-header.md
+2026-09-12-opencode-go-session-header.md: c6afd6ca6ef7bb6b4502bbbf063d3a61818c84a4
+2026-09-12-opencode-go-session-header.zh.md: c7f8b51d0ce64ba0c719ac321a91920f255f8a6f
